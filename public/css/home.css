@@ -1,0 +1,41 @@
+.main-text{
+    background: linear-gradient(90deg,  #FFA500,#4CAF50,  #800000,#FFFF00);
+    -webkit-background-clip: text;
+    color: transparent;
+    margin-bottom: 10px;
+}
+
+.facescanner{
+    width: 400px;
+    height: 350px;
+}
+
+.vote-image{
+    width: 60px;
+    height: 80px;
+    margin-left: 20px;
+}
+
+.part-selector{
+    display: flex;
+    flex-direction: row;
+}
+
+
+.party-select{
+    display: flex;
+    align-self: center;
+    margin-left: 20px;
+    width: 100%;
+}
+
+.party-input{
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    width: 200px;
+}
+
+.vote-box-selected {
+    border: 2px solid black;
+}

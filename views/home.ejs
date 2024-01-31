@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting Application</title>
+
+    <!-- Boostrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/home.css"/>
+
+    <!-- Convert Scripts -->
+    <script src="PDF417/BigInteger.min.js"></script>
+    <script src="PDF417/dist/zxing-pdf417.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+</head>
+<body>
+
+    <div class="container mt-5">
+
+        <div class="text-center">
+            <h3 class="main-text">E-Voting System</h3>
+            <img src="images/flag.gif" class="img-fluid mx-auto" alt="Centered Image">
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3>Complete your Identity Verification</h3>
+            </div>
+            <div class="card-body">
+                <form accept="" method="#">
+
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFile">Front Side (National Identity Card)</label>
+                                <small>We will use real time camera / Reader to scan </small>
+                                <input type="file" class="form-control" id="forntFile" accept=".png, .jpg, .jpeg" required/>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFile">Back Side (Natioanl Identity Card)</label>
+                                <small>We will use real time camera / Reader to scan </small>
+                                <input type="file" class="form-control" id="file" accept=".png, .jpg, .jpeg" required/>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+        
+                </form>
+            
+        
+                <form action="/verfication" method="post">
+                    <div class="mb-3">
+                        <label for="idNumber" class="form-label">ID Number</label>
+                        <input type="text" class="form-control" id="idNumber" readonly>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="text" class="form-control" id="dob"  readonly>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <input type="text" class="form-control" id="gender"  readonly>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="registrationDate" class="form-label">Registration Date</label>
+                        <input type="text" class="form-control" id="registrationDate"  readonly>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" rows="3" readonly></textarea>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="employer" class="form-label">#</label>
+                        <input type="text" class="form-control" id="employer"  readonly>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="hashValue" class="form-label">#Hash Value</label>
+                        <input type="text" class="form-control" id="hashValue"  readonly>
+                    </div>
+                    <div class="text-center mt-5 mb-3">
+                        <button class="btn btn-success text-center mx-auto">Proceed to Video Verification.</button>
+
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+        
+
+        
+
+        <img id="uploadedImagew" hidden/>
+    </div>
+    
+    <!-- Boostrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+
+        (function(window, $, undefined) {
+            $(function() {
+
+                function handleFiles(f) {
+                    var img = $('#uploadedImagew');
+                    img[0].src = URL.createObjectURL(f.target.files[0]);
+                }
+
+                function doScan(image) {
+                    var
+                            canvas = document.createElement('canvas'),
+                            canvas_context = canvas.getContext('2d'),
+                            source,
+                            binarizer,
+                            bitmap;
+
+                    $('.error').empty();
+                    $('.decodedText').empty();
+
+                    canvas.width = image.naturalWidth;
+                    canvas.height = image.naturalHeight;
+                    canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                    try {
+                        source = new ZXing.BitmapLuminanceSource(canvas_context, image);
+                        binarizer = new ZXing.Common.HybridBinarizer(source);
+                        bitmap = new ZXing.BinaryBitmap(binarizer);
+                        const jsonObj = ZXing.PDF417.PDF417Reader.decode(bitmap, null, false);
+
+                        const lines = jsonObj[0].Text.split('\n');
+
+                        document.getElementById('idNumber').value = lines[1].trim();
+                        document.getElementById('dob').value = lines[2].trim();
+                        document.getElementById('gender').value = lines[3].trim();
+                        document.getElementById('registrationDate').value = lines[4].trim();
+                        document.getElementById('address').value = lines[5].trim() + " ,\n" + lines[6].trim() +",\n" + lines[8].trim();
+                        document.getElementById('employer').value = lines[9].trim();
+                        document.getElementById('hashValue').value = lines[10].trim();
+
+                    } catch (err) {
+                        $('.error').text(err);
+                    }
+                }
+
+                
+
+                $('#uploadedImagew').load(function() {
+                    doScan($('#uploadedImagew')[0]);
+                });
+
+                $('#file').change(handleFiles);
+            });
+        })(window, window.jQuery);
+    </script>
+</body>
+</html>
+
+
+    
+    
